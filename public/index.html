@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sehat Sathi — Find &amp; Book Doctors Across Pakistan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;500;600;700&family=Work+Sans:wght@400;500;600;700&family=Noto+Nastaliq+Urdu:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<header class="site">
+  <div class="nav-row">
+    <a href="#" class="logo" onclick="showPage('home');return false;">
+      <span class="cross"></span> Sehat Sathi
+    </a>
+    <nav class="links" id="navLinks">
+      <a href="#" data-page="home" onclick="showPage('home');return false;">Home</a>
+      <a href="#" data-page="results" onclick="showPage('results');return false;">Find Doctors</a>
+      <a href="#" data-page="contact" onclick="showPage('contact');return false;">Contact</a>
+    </nav>
+    <div class="nav-actions">
+      <a href="tel:+921112223334" class="btn btn-urgent btn-sm">📞 Call Now</a>
+      <button class="btn btn-accent btn-sm" id="portalBtn" style="display:none;" onclick="showPage('doctor-portal');loadDoctorPortal();">My Portal</button>
+      <button class="btn btn-ghost btn-sm" id="authAreaBtn" onclick="openLogin()">Login / Sign up</button>
+      <button class="hamburger" onclick="document.getElementById('navLinks').classList.toggle('mobile-open')" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ================= HOME ================= -->
+  <div class="page visible" id="page-home">
+    <div class="hero">
+      <div>
+        <span class="eyebrow">✓ Verified doctors across Pakistan</span>
+        <h1>Apna <em>doctor</em> dhoondain.<br>Book in minutes.</h1>
+        <p class="lede">Search by city, specialty, or hospital. Compare fees, read real patient reviews, and book an appointment — or just call the clinic directly.</p>
+        <div class="trust-row">
+          <div><strong id="statDoctors">…</strong>Verified doctors</div>
+          <div><strong id="statCities">…</strong>Cities covered</div>
+          <div><strong>60,000+</strong>Appointments booked</div>
+        </div>
+      </div>
+
+      <div class="rx-card">
+        <div class="rx-head">
+          <div class="rx-mark">℞ <small>Find care</small></div>
+          <span class="stamp">Verified</span>
+        </div>
+        <div class="search-tabs">
+          <button type="button" class="active" data-mode="specialty" onclick="setSearchMode('specialty')">Specialty</button>
+          <button type="button" data-mode="city" onclick="setSearchMode('city')">City</button>
+          <button type="button" data-mode="hospital" onclick="setSearchMode('hospital')">Hospital</button>
+        </div>
+        <div class="rx-field">
+          <label for="heroPrimary" id="heroPrimaryLabel">Specialty</label>
+          <select id="heroPrimary"></select>
+        </div>
+        <div class="rx-field">
+          <label for="heroCity">City</label>
+          <select id="heroCity"></select>
+        </div>
+        <button class="btn btn-primary" onclick="runHeroSearch()">Search Doctors</button>
+      </div>
+    </div>
+
+    <section class="specialties">
+      <h2>Search by symptom or specialty</h2>
+      <p class="sub">Not sure who to see? Tap a specialty to browse doctors, or tell us the symptom on the next page.</p>
+      <div class="spec-grid" id="specGrid">Loading specialties…</div>
+    </section>
+  </div>
+
+  <div class="emergency-strip">
+    <div class="container">
+      <div class="msg">🚨 Medical emergency? Don't wait for a booking.</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <a href="tel:1122" class="btn btn-urgent btn-sm">Call Rescue 1122</a>
+        <a href="#" class="btn btn-ghost btn-sm" onclick="showPage('contact');return false;">Nearby Emergency Hospitals</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= RESULTS ================= -->
+  <div class="page" id="page-results">
+    <div class="page-head">
+      <h2>Find a Doctor</h2>
+      <p class="sub">Filter by city, specialty, and hospital to see verified profiles, fees, and available slots.</p>
+    </div>
+    <div class="results-wrap">
+      <aside class="filters">
+        <h4>Filter results</h4>
+        <div class="rx-field">
+          <label for="fSpecialty">Specialty</label>
+          <select id="fSpecialty" onchange="applyFilters()"></select>
+        </div>
+        <div class="rx-field">
+          <label for="fCity">City</label>
+          <select id="fCity" onchange="applyFilters()"></select>
+        </div>
+        <div class="rx-field">
+          <label for="fHospital">Hospital / Clinic</label>
+          <input type="text" id="fHospital" placeholder="e.g. Shifa International" oninput="applyFilters()">
+        </div>
+        <div class="rx-field">
+          <label for="fLang">Language</label>
+          <select id="fLang" onchange="applyFilters()">
+            <option value="">Any</option>
+            <option>Urdu</option>
+            <option>English</option>
+            <option>Punjabi</option>
+            <option>Pashto</option>
+            <option>Sindhi</option>
+          </select>
+        </div>
+        <button class="btn btn-ghost" style="width:100%;justify-content:center;" onclick="resetFilters()">Reset filters</button>
+      </aside>
+      <div>
+        <div class="result-count" id="resultCount">Loading…</div>
+        <div class="doctor-grid" id="doctorGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= DOCTOR PROFILE ================= -->
+  <div class="page" id="page-profile">
+    <div class="profile-wrap" id="profileWrap"></div>
+  </div>
+
+  <!-- ================= BOOKING ================= -->
+  <div class="page" id="page-booking">
+    <div class="page-head">
+      <h2>Book Appointment</h2>
+      <p class="sub" id="bookingSub">Confirm your details and preferred slot.</p>
+    </div>
+    <div class="booking-wrap">
+      <div id="bookingFormWrap" class="rx-card booking-form">
+        <div class="rx-field">
+          <label>Full name</label>
+          <input type="text" id="bkName" placeholder="Your full name">
+        </div>
+        <div class="form-row">
+          <div class="rx-field">
+            <label>Phone number</label>
+            <input type="tel" id="bkPhone" placeholder="03xx-xxxxxxx">
+          </div>
+          <div class="rx-field">
+            <label>Preferred date</label>
+            <input type="date" id="bkDate">
+          </div>
+        </div>
+        <div class="rx-field">
+          <label>Selected time slot</label>
+          <input type="text" id="bkSlot" readonly placeholder="Choose a slot on the doctor's profile page">
+        </div>
+        <div class="rx-field">
+          <label>Reason for visit (optional)</label>
+          <input type="text" id="bkReason" placeholder="Briefly describe your symptoms">
+        </div>
+        <button class="btn btn-primary" id="bkSubmitBtn" onclick="confirmBooking()">Confirm Appointment</button>
+      </div>
+      <div id="bookingConfirmed" style="display:none;"></div>
+    </div>
+  </div>
+
+  <!-- ================= CONTACT ================= -->
+  <div class="page" id="page-contact">
+    <div class="page-head">
+      <h2>Contact &amp; Emergency</h2>
+      <p class="sub">Reach our support team, or find emergency hospitals near you.</p>
+    </div>
+    <div class="contact-wrap">
+      <div class="contact-card">
+        <h4>Send us a message</h4>
+        <div class="rx-field"><label>Name</label><input type="text" id="cName" placeholder="Your name"></div>
+        <div class="rx-field"><label>Email or phone</label><input type="text" id="cContact" placeholder="How can we reach you?"></div>
+        <div class="rx-field"><label>Message</label><input type="text" id="cMessage" placeholder="How can we help?"></div>
+        <button class="btn btn-primary" onclick="sendContactMessage()">Send Message</button>
+        <p style="margin-top:16px;font-size:.85rem;color:var(--ink-soft);">Or reach us directly:</p>
+        <a href="tel:+921112223334" class="btn btn-ghost btn-sm" style="margin-right:8px;">📞 021-111-222-333</a>
+        <a href="https://wa.me/921112223334" class="btn btn-accent btn-sm">💬 WhatsApp</a>
+      </div>
+      <div class="contact-card">
+        <h4>🚨 Emergency Hospitals</h4>
+        <p style="font-size:.85rem;color:var(--ink-soft);">For life-threatening emergencies, call <strong>1122</strong> or go directly to the nearest hospital.</p>
+        <div class="er-list" id="emergencyList">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= DOCTOR PORTAL ================= -->
+  <div class="page" id="page-doctor-portal">
+    <div class="page-head">
+      <h2>Doctor Portal</h2>
+      <p class="sub">Update the profile patients see, manage your available timings, and check who has booked you.</p>
+    </div>
+    <div class="portal-wrap" id="portalWrap">
+      <p style="padding:0 24px;color:var(--ink-soft);">Log in with a doctor account to access your portal.</p>
+    </div>
+  </div>
+
+</main>
+
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <button class="close" onclick="closeLogin()" aria-label="Close">✕</button>
+    <div class="role-tabs">
+      <button type="button" class="active" data-role="patient" onclick="setRole('patient')">Patient</button>
+      <button type="button" data-role="doctor" onclick="setRole('doctor')">Doctor</button>
+    </div>
+    <h3 id="authTitle">Patient Login</h3>
+    <div class="rx-field" id="nameField" style="display:none;"><label>Full name</label><input type="text" id="authName" placeholder="Your full name"></div>
+    <div class="rx-field"><label>Phone number</label><input type="tel" id="authPhone" placeholder="03xx-xxxxxxx"></div>
+    <div class="rx-field"><label>Password</label><input type="password" id="authPassword" placeholder="••••••••"></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="submitAuth()">Continue</button>
+    <div class="toggle-auth">
+      <span id="authSwitchText">New here?</span> <button onclick="toggleAuthMode()" id="authSwitchBtn">Create an account</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer>
+  <div class="container">
+    <div>
+      <h5>Sehat Sathi <span class="urdu">صحت ساتھی</span></h5>
+      <p style="font-size:.85rem;max-width:32ch;color:#b9d6cf;">Find and book trusted doctors across Pakistan — in English or Urdu.</p>
+    </div>
+    <div>
+      <h5>Explore</h5>
+      <a href="#" onclick="showPage('results');return false;">Find Doctors</a>
+      <a href="#" onclick="showPage('contact');return false;">Contact</a>
+      <a href="#" onclick="openLogin();return false;">Doctor Sign up</a>
+    </div>
+    <div>
+      <h5>Support</h5>
+      <a href="tel:+921112223334">021-111-222-333</a>
+      <a href="https://wa.me/921112223334">WhatsApp Support</a>
+    </div>
+  </div>
+  <div class="bottom">© 2026 Sehat Sathi. Demo project — not a real medical booking service.</div>
+</footer>
+
+<script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "sehat-sathi",
+  "version": "1.0.0",
+  "description": "Find and book doctors across Pakistan — full-stack demo (Node.js + SQLite, zero external dependencies).",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "license": "MIT"
+}
